@@ -4,6 +4,7 @@ var babel  = require("babel-core");
 var util   = require("util");
 var path   = require("path");
 var fs     = require("fs");
+var createHash = require("crypto").createHash;
 var mkdirp = require("mkdirp").sync;
 
 module.exports = Babelify;

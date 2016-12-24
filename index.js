@@ -30,10 +30,10 @@ Babelify.prototype._flush = function (callback) {
   try {
     var result;
     var hash;
-    if (babelCache) {
+    if (this._babelCache) {
       hash = createHash('sha1').update(src).digest('hex');
       try {
-        result = fs.readFileSync(path.join(babelCache, hash + '.js'), 'utf8');
+        result = fs.readFileSync(path.join(this._babelCache, hash + '.js'), 'utf8');
       } catch (ex) {
         if (ex.code !== 'ENOENT') {
           throw ex;
@@ -42,8 +42,8 @@ Babelify.prototype._flush = function (callback) {
     }
     if (result === undefined) {
       result = babel.transform(this._data, this._opts).code;
-      if (babelCache) {
-        fs.writeFileSync(path.join(babelCache, hash + '.js'), result);
+      if (this._babelCache) {
+        fs.writeFileSync(path.join(this._babelCache, hash + '.js'), result);
       }
     }
     this.push(result);

@@ -2,11 +2,14 @@ var assign = require("object-assign");
 var stream = require("stream");
 var babel  = require("babel-core");
 var util   = require("util");
+var path   = require("path");
+var fs     = require("fs");
+var mkdirp = require("mkdirp").sync;
 
 module.exports = Babelify;
 util.inherits(Babelify, stream.Transform);
 
-function Babelify(filename, opts) {
+function Babelify(filename, opts, babelCache) {
   if (!(this instanceof Babelify)) {
     return Babelify.configure(opts)(filename);
   }
@@ -15,6 +18,7 @@ function Babelify(filename, opts) {
   this._data = "";
   this._filename = filename;
   this._opts = assign({filename: filename}, opts);
+  this._babelCache = babelCache;
 }
 
 Babelify.prototype._transform = function (buf, enc, callback) {
@@ -24,10 +28,25 @@ Babelify.prototype._transform = function (buf, enc, callback) {
 
 Babelify.prototype._flush = function (callback) {
   try {
-    var result = babel.transform(this._data, this._opts);
-    this.emit("babelify", result, this._filename);
-    var code = result.code;
-    this.push(code);
+    var result;
+    var hash;
+    if (babelCache) {
+      hash = createHash('sha1').update(src).digest('hex');
+      try {
+        result = fs.readFileSync(path.join(babelCache, hash + '.js'), 'utf8');
+      } catch (ex) {
+        if (ex.code !== 'ENOENT') {
+          throw ex;
+        }
+      }
+    }
+    if (result === undefined) {
+      result = babel.transform(this._data, this._opts).code;
+      if (babelCache) {
+        fs.writeFileSync(path.join(babelCache, hash + '.js'), result);
+      }
+    }
+    this.push(result);
   } catch(err) {
     this.emit("error", err);
     return;
@@ -40,7 +59,11 @@ Babelify.configure = function (opts) {
   var extensions = opts.extensions ? babel.util.arrayify(opts.extensions) : null;
   var sourceMapsAbsolute = opts.sourceMapsAbsolute;
   if (opts.sourceMaps !== false) opts.sourceMaps = "inline";
-
+  var babelCache = opts.babelCache ? path.resolve(opts.babelCache) : null;
+  if (babelCache) {
+    delete opts.babelCache;
+    mkdirp(babelCache);
+  }
   // babelify specific options
   delete opts.sourceMapsAbsolute;
   delete opts.extensions;
@@ -71,6 +94,6 @@ Babelify.configure = function (opts) {
       ? assign({sourceFileName: filename}, opts)
       : opts;
 
-    return new Babelify(filename, _opts);
+    return new Babelify(filename, _opts, babelCache);
   };
 };

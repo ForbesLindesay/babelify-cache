@@ -1,19 +1,20 @@
 {
-  "name": "babelify",
+  "name": "babelify-cache",
   "description": "Babel browserify transform",
   "version": "7.3.0",
   "author": "Sebastian McKenzie <sebmck@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/babel/babelify",
+  "homepage": "https://github.com/babel/babelify-cache",
   "repository": {
     "type": "git",
-    "url": "https://github.com/babel/babelify.git"
+    "url": "https://github.com/babel/babelify-cache.git"
   },
   "bugs": {
-    "url": "https://github.com/babel/babelify/issues"
+    "url": "https://github.com/babel/babelify-cache/issues"
   },
   "dependencies": {
     "babel-core": "^6.0.14",
+    "mkdirp": "^0.5.1",
     "object-assign": "^4.0.0"
   },
   "devDependencies": {

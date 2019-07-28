@@ -40,7 +40,7 @@ Object.defineProperty(module.exports, Symbol.hasInstance, {
 });
 
 function buildTransform(opts) {
-  var babelCache = opts.babelCache ? path.resolve(opts.babelCache) : null;
+  var babelCache = opts && opts.babelCache ? path.resolve(opts.babelCache) : null;
   if (babelCache) {
     delete opts.babelCache;
     mkdirp(babelCache);

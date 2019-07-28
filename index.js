@@ -156,7 +156,7 @@ class BabelifyStream extends stream.Transform {
       }
     }
     if (result) {
-      this.push(code);
+      this.push(result);
       callback();
     }
     transform(data, this._opts, (err, result) => {

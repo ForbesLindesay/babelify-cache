@@ -167,8 +167,8 @@ class BabelifyStream extends stream.Transform {
         this.emit("babelify", result, this._opts.filename);
         var code = result !== null ? result.code : data;
 
-        if (this._babelCache) {
-          fs.writeFileSync(path.join(this._babelCache, hash + '.js'), result);
+        if (this._babelCache && result) {
+          fs.writeFileSync(path.join(this._babelCache, hash + '.js'), code);
         }
 
         // Note: Node 8.x allows passing 'code' to the callback instead of
